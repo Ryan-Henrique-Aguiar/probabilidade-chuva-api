@@ -1,7 +1,6 @@
 package br.com.probabilidadechuva.service;
 
 import br.com.probabilidadechuva.repository.CidadeRepository;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -70,5 +69,50 @@ public class PrecipitacaoService {
         }
 
         return diasClassificados;
+    }
+    public double probabilidadeChuva5Dias(
+            String cidade,
+            int diaInicio,
+            int mesInicio) throws IOException {
+
+        int diasComChuva = 0;
+        int totalDias = 0;
+
+        // varre todos os anos disponíveis (2000–2025)
+        for (int ano = 2000; ano <= 2025; ano++) {
+
+            Map<LocalDate, List<Double>> dadosAno;
+
+            try {
+                dadosAno = repository.buscarDadosAno(cidade, ano);
+            } catch (IOException e) {
+                // cidade não tem dados nesse ano → ignora
+                continue;
+            }
+
+            LocalDate dataInicial = LocalDate.of(ano, mesInicio, diaInicio);
+
+            for (int i = 0; i < 5; i++) {
+                LocalDate data = dataInicial.plusDays(i);
+
+                if (!dadosAno.containsKey(data)) continue;
+
+                double totalDia = dadosAno.get(data)
+                        .stream()
+                        .mapToDouble(x -> x)
+                        .sum();
+
+                if (totalDia >= 1) {
+                    diasComChuva++;
+                }
+                totalDias++;
+            }
+        }
+
+        if (totalDias == 0) return 0;
+
+        double p = (double) diasComChuva / totalDias;
+
+        return 1 - Math.pow(1 - p, 5);
     }
 }
