@@ -1,10 +1,13 @@
 package br.com.probabilidadechuva.controller;
 
+import br.com.probabilidadechuva.dto.ClassficacaoChuvaDto;
+import br.com.probabilidadechuva.service.LocalizacaoService;
 import br.com.probabilidadechuva.service.PrecipitacaoService;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,8 +28,8 @@ public class CidadeController {
 
         return service.mediasDiarias(nome, ano);
     }
-    @GetMapping("/classificar")
-    public Map<LocalDate,String>classificarDiarias(
+    @GetMapping("/classificacao")
+    public List<ClassficacaoChuvaDto>classificarChuva(
             @RequestParam String nome,
             @RequestParam int ano) throws IOException{
         return service.classificarChuva(nome, ano);
@@ -45,5 +48,6 @@ public class CidadeController {
 
         return service.probabilidadeChuva5Dias(nome, dia, mes);
     }
+
 
 }

@@ -1,10 +1,12 @@
 package br.com.probabilidadechuva.service;
 
+import br.com.probabilidadechuva.dto.ClassficacaoChuvaDto;
 import br.com.probabilidadechuva.repository.CidadeRepository;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -17,6 +19,7 @@ public class PrecipitacaoService {
     public PrecipitacaoService(CidadeRepository repository) {
         this.repository = repository;
     }
+
     public Map<LocalDate,List<Double>> lerdadosano(String cidade, int ano) throws IOException {
         return repository.buscarDadosAno(cidade,ano);
     }
@@ -41,9 +44,11 @@ public class PrecipitacaoService {
 
         return medias;
     }
-    public Map<LocalDate,String> classificarChuva(String cidade,int ano) throws IOException{
+    public List<ClassficacaoChuvaDto> classificarChuva(String cidade,int ano) throws IOException{
+
         Map<LocalDate,List<Double>> dados = repository.buscarDadosAno(cidade,ano);
-        Map<LocalDate,String>diasClassificados = new TreeMap<>();
+
+        List<ClassficacaoChuvaDto> resultado = new ArrayList<>();
 
         for (var entry : dados.entrySet()) {
 
@@ -51,6 +56,12 @@ public class PrecipitacaoService {
                     .stream()
                     .mapToDouble(x -> x)
                     .sum();
+
+            double maxHorario = entry.getValue()
+                    .stream()
+                    .mapToDouble(x -> x)
+                    .max()
+                    .orElse(0);
 
             String classificacao;
 
@@ -65,10 +76,18 @@ public class PrecipitacaoService {
             } else {
                 classificacao = "Chuva muito forte";
             }
-            diasClassificados.put(entry.getKey(), classificacao);
-        }
 
-        return diasClassificados;
+
+            resultado.add(
+                    new ClassficacaoChuvaDto(
+                            entry.getKey(),
+                            totalDia,
+                            maxHorario,
+                            classificacao
+                    )
+            );
+        }
+        return resultado;
     }
     public double probabilidadeChuva5Dias(
             String cidade,

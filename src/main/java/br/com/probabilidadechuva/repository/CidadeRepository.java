@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,9 @@ public class CidadeRepository {
     @Value("${dados.caminho}")
     private String pastaDados;
 
+    @Value("${dados2025.caminho}")
+    private String pastaDados2025;
+
     public CidadeRepository(CsvReader csvReader) {
         this.csvReader = csvReader;
     }
@@ -26,4 +30,6 @@ public class CidadeRepository {
 
         return csvReader.lerDadosAno(pastaDados, cidade, ano);
     }
+
+
 }
