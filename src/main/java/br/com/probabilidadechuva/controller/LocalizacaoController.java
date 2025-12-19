@@ -27,11 +27,11 @@ public class LocalizacaoController {
     }
 
     @GetMapping("/listarcidadesporestado")
-    public Map<String, List<String>> getLocalizacoes() throws IOException {
+    public Map<String, Map<String, List<String>>> getLocalizacoes() throws IOException {
         // Extrai cidades por estado
         Map<String, List<String>> cidadesPorEstado = localizacaoService.listarCidadesPorEstado();
         // Organiza por região
-        return cidadesPorEstado;
+        return CsvNameReader.organizarPorRegiao(cidadesPorEstado);
     }
     @GetMapping("/listarcidades")
     public ArrayList<String> listarcidades(){
