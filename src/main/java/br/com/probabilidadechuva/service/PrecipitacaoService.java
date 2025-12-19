@@ -1,5 +1,6 @@
 package br.com.probabilidadechuva.service;
 
+import br.com.probabilidadechuva.dto.ChuvaDiariaDto;
 import br.com.probabilidadechuva.dto.ClassficacaoChuvaDto;
 import br.com.probabilidadechuva.repository.CidadeRepository;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,23 @@ public class PrecipitacaoService {
         }
 
         return medias;
+    }
+    public List<ChuvaDiariaDto> mediasDiariasDTO(
+            String cidade, int ano) throws IOException {
+
+        Map<LocalDate, Double> medias =
+                mediasDiarias(cidade, ano);
+
+        List<ChuvaDiariaDto> lista = new ArrayList<>();
+
+        medias.forEach((data, valor) -> {
+            lista.add(new ChuvaDiariaDto(
+                    data.toString(),
+                    valor
+            ));
+        });
+
+        return lista;
     }
     public List<ClassficacaoChuvaDto> classificarChuva(String cidade,int ano) throws IOException{
 

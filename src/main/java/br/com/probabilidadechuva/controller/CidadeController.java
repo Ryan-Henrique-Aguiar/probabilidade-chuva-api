@@ -1,5 +1,6 @@
 package br.com.probabilidadechuva.controller;
 
+import br.com.probabilidadechuva.dto.ChuvaDiariaDto;
 import br.com.probabilidadechuva.dto.ClassficacaoChuvaDto;
 import br.com.probabilidadechuva.service.LocalizacaoService;
 import br.com.probabilidadechuva.service.PrecipitacaoService;
@@ -22,11 +23,11 @@ public class CidadeController {
     }
 
     @GetMapping("/medias")
-    public Map<LocalDate, Double> mediasDiarias(
+    public List<ChuvaDiariaDto> mediasDiarias(
             @RequestParam String nome,
             @RequestParam int ano) throws IOException {
 
-        return service.mediasDiarias(nome, ano);
+        return service.mediasDiariasDTO(nome, ano);
     }
     @GetMapping("/classificacao")
     public List<ClassficacaoChuvaDto>classificarChuva(
