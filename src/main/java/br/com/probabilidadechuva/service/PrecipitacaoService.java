@@ -62,51 +62,53 @@ public class PrecipitacaoService {
 
         return lista;
     }
-    public List<ClassficacaoChuvaDto> classificarChuva(String cidade,int ano) throws IOException{
+    public List<ClassficacaoChuvaDto> classificarChuva(String cidade, int ano) throws IOException {
 
-        Map<LocalDate,List<Double>> dados = repository.buscarDadosAno(cidade,ano);
+        Map<LocalDate, List<Double>> dados = repository.buscarDadosAno(cidade, ano);
 
         List<ClassficacaoChuvaDto> resultado = new ArrayList<>();
 
-        for (var entry : dados.entrySet()) {
+        dados.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(entry -> {
 
-            double totalDia = entry.getValue()
-                    .stream()
-                    .mapToDouble(x -> x)
-                    .sum();
+                    double totalDia = entry.getValue()
+                            .stream()
+                            .mapToDouble(Double::doubleValue)
+                            .sum();
 
-            double maxHorario = entry.getValue()
-                    .stream()
-                    .mapToDouble(x -> x)
-                    .max()
-                    .orElse(0);
+                    double maxHorario = entry.getValue()
+                            .stream()
+                            .mapToDouble(Double::doubleValue)
+                            .max()
+                            .orElse(0);
 
-            String classificacao;
+                    String classificacao;
 
-            if (totalDia == 0) {
-                classificacao = "Sem chuva";
-            } else if (totalDia < 2.5) {
-                classificacao = "Chuva fraca";
-            } else if (totalDia < 10) {
-                classificacao = "Chuva moderada";
-            } else if (totalDia < 50) {
-                classificacao = "Chuva forte";
-            } else {
-                classificacao = "Chuva muito forte";
-            }
+                    if (totalDia == 0) {
+                        classificacao = "Sem chuva";
+                    } else if (totalDia < 2.5) {
+                        classificacao = "Chuva fraca";
+                    } else if (totalDia < 10) {
+                        classificacao = "Chuva moderada";
+                    } else if (totalDia < 50) {
+                        classificacao = "Chuva forte";
+                    } else {
+                        classificacao = "Chuva muito forte";
+                    }
 
+                    resultado.add(
+                            new ClassficacaoChuvaDto(
+                                    entry.getKey(),
+                                    totalDia,
+                                    maxHorario,
+                                    classificacao
+                            )
+                    );
+                });
 
-            resultado.add(
-                    new ClassficacaoChuvaDto(
-                            entry.getKey(),
-                            totalDia,
-                            maxHorario,
-                            classificacao
-                    )
-            );
-        }
-        return resultado;
-    }
+        return resultado;}
+
     public double probabilidadeChuva5Dias(
             String cidade,
             int diaInicio,
