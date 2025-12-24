@@ -14,14 +14,28 @@ public class PrecipitacaoService {
 
     private final CidadeRepository repository;
 
+    // Construtor injetando o repositório de dados de cidades
     public PrecipitacaoService(CidadeRepository repository) {
         this.repository = repository;
     }
 
+
+    /**
+     * Lê os dados de chuva de um determinado ano para uma cidade.
+     * @param cidade Nome da cidade
+     * @param ano Ano a ser buscado
+     * @return Map<LocalDate, List<Double>> contendo listas de valores de chuva por dia
+     */
     public Map<LocalDate,List<Double>> lerdadosano(String cidade, int ano) throws IOException {
         return repository.buscarDadosAno(cidade,ano);
     }
 
+    /**
+     * Calcula a média diária de chuva para cada dia de um ano específico.
+     * @param cidade Nome da cidade
+     * @param ano Ano a ser calculado
+     * @return Map<LocalDate, Double> com média diária de chuva
+     */
     public Map<LocalDate, Double> mediasDiarias(
             String cidade, int ano) throws IOException {
 
@@ -42,6 +56,11 @@ public class PrecipitacaoService {
 
         return medias;
     }
+
+    /**
+     * Gera uma lista de DTOs com as médias diárias de chuva,
+     * pronta para envio ao frontend.
+     */
     public List<ChuvaDiariaDto> mediasDiariasDTO(
             String cidade, int ano) throws IOException {
 
@@ -51,6 +70,7 @@ public class PrecipitacaoService {
         List<ChuvaDiariaDto> lista = new ArrayList<>();
 
         medias.forEach((data, valor) -> {
+            // Converte cada média em DTO com data e valor
             lista.add(new ChuvaDiariaDto(
                     data.toString(),
                     valor
@@ -59,6 +79,10 @@ public class PrecipitacaoService {
 
         return lista;
     }
+    /**
+     * Classifica a chuva de cada dia de um ano em categorias
+     * (Sem chuva, fraca, moderada, forte, muito forte).
+     */
     public List<ClassficacaoChuvaDto> classificarChuva(String cidade, int ano) throws IOException {
 
         Map<LocalDate, List<Double>> dados = repository.buscarDadosAno(cidade, ano);
@@ -66,7 +90,7 @@ public class PrecipitacaoService {
         List<ClassficacaoChuvaDto> resultado = new ArrayList<>();
 
         dados.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
+                .sorted(Map.Entry.comparingByKey())  // ordena por data
                 .forEach(entry -> {
 
                     double totalDia = entry.getValue()
@@ -80,6 +104,7 @@ public class PrecipitacaoService {
                             .max()
                             .orElse(0);
 
+                    // Define a classificação da chuva
                     String classificacao;
 
                     if (totalDia == 0) {
@@ -106,12 +131,20 @@ public class PrecipitacaoService {
 
         return resultado;}
 
+    /**
+     * Classe auxiliar para acumular valores de chuva durante
+     * a média de vários anos.
+     */
     public class Acumulador {
 
         double somaTotalDia = 0;
         double somaMaxHorario = 0;
         int quantidade = 0;
     }
+    /**
+     * Calcula a média da classificação de chuva para cada dia/mês
+     * considerando todos os anos disponíveis (2000–ano atual).
+     */
 
     public List<ClassficacaoChuvaDto> mediaClassificacaoDeChuva(String cidade) throws IOException {
 
@@ -119,6 +152,7 @@ public class PrecipitacaoService {
 
         Map<LocalDate, Acumulador> mapa = new HashMap<>();
 
+        // Percorre todos os anos para acumular dados
         for (int ano = anoAtual; ano >= 2000; ano--) {
 
             List<ClassficacaoChuvaDto> lista = classificarChuva(cidade, ano);
@@ -144,6 +178,12 @@ public class PrecipitacaoService {
             }
         }
 
+                    /*
+              Atualiza a lista de médias:
+              - Calcula totalDia médio
+              - Calcula maxHorario médio
+              - Define classificação baseado no totalDia
+            */
         // Criar lista FINAL com médias
         List<ClassficacaoChuvaDto> resultado = new ArrayList<>();
 
@@ -151,6 +191,7 @@ public class PrecipitacaoService {
 
             Acumulador acc = entry.getValue();
 
+            // Atualiza o DTO com os valores médios
             ClassficacaoChuvaDto media = new ClassficacaoChuvaDto();
             media.setData(entry.getKey());
             double totaldia = acc.somaTotalDia/acc.quantidade;
@@ -174,10 +215,15 @@ public class PrecipitacaoService {
 
             resultado.add(media);
         }
+        // Ordena a lista por data (dia/mês)
         resultado.sort(Comparator.comparing(ClassficacaoChuvaDto::getData));
         return resultado;
     }
 
+    /**
+     * Calcula a probabilidade de chuva em um período de 5 dias
+     * a partir de uma data inicial (dia/mês) considerando todos os anos.
+     */
     public double probabilidadeChuva5Dias(
             String cidade,
             int diaInicio,
@@ -219,6 +265,7 @@ public class PrecipitacaoService {
 
         if (totalDias == 0) return 0;
 
+        // Calcula a probabilidade composta
         double p = (double) diasComChuva / totalDias;
 
         return 1 - Math.pow(1 - p, 5);
