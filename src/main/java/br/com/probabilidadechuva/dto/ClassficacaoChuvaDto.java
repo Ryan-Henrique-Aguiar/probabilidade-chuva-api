@@ -14,6 +14,9 @@ public class ClassficacaoChuvaDto {
         this.maxHorario = maxHorario;
         this.classificacao = classificacao;
     }
+    public ClassficacaoChuvaDto(){
+
+    }
 
     public LocalDate getData() {
         return data;
@@ -29,5 +32,21 @@ public class ClassficacaoChuvaDto {
 
     public String getClassificacao() {
         return classificacao;
+    }
+
+    public void setData(LocalDate data) {
+        this.data = data;
+    }
+
+    public void setTotalDia(double totalDia) {
+        this.totalDia = totalDia;
+    }
+
+    public void setMaxHorario(double maxHorario) {
+        this.maxHorario = maxHorario;
+    }
+
+    public void setClassificacao(String classificacao) {
+        this.classificacao = classificacao;
     }
 }

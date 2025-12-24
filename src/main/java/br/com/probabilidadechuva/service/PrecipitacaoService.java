@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 @Service
 public class PrecipitacaoService {
@@ -108,6 +105,78 @@ public class PrecipitacaoService {
                 });
 
         return resultado;}
+
+    public class Acumulador {
+
+        double somaTotalDia = 0;
+        double somaMaxHorario = 0;
+        int quantidade = 0;
+    }
+
+    public List<ClassficacaoChuvaDto> mediaClassificacaoDeChuva(String cidade) throws IOException {
+
+        int anoAtual = LocalDate.now().getYear();
+
+        Map<LocalDate, Acumulador> mapa = new HashMap<>();
+
+        for (int ano = anoAtual; ano >= 2000; ano--) {
+
+            List<ClassficacaoChuvaDto> lista = classificarChuva(cidade, ano);
+
+            for (ClassficacaoChuvaDto dto : lista) {
+
+                LocalDate dataOriginal = dto.getData();
+
+                // data SEM ano (ano fixo)
+                LocalDate dataSemAno = LocalDate.of(
+                        2000,
+                        dataOriginal.getMonth(),
+                        dataOriginal.getDayOfMonth()
+                );
+
+                Acumulador acc = mapa.getOrDefault(dataSemAno, new Acumulador());
+
+                acc.somaTotalDia += dto.getTotalDia();
+                acc.somaMaxHorario += dto.getMaxHorario();
+                acc.quantidade++;
+
+                mapa.put(dataSemAno, acc);
+            }
+        }
+
+        // Criar lista FINAL com médias
+        List<ClassficacaoChuvaDto> resultado = new ArrayList<>();
+
+        for (Map.Entry<LocalDate, Acumulador> entry : mapa.entrySet()) {
+
+            Acumulador acc = entry.getValue();
+
+            ClassficacaoChuvaDto media = new ClassficacaoChuvaDto();
+            media.setData(entry.getKey());
+            double totaldia = acc.somaTotalDia/acc.quantidade;
+            media.setTotalDia(totaldia);
+            media.setMaxHorario(acc.somaMaxHorario / acc.quantidade);
+
+            String classificacao;
+
+            if (totaldia == 0) {
+                classificacao = "Sem chuva";
+            } else if (totaldia < 2.5) {
+                classificacao = "Chuva fraca";
+            } else if (totaldia < 10) {
+                classificacao = "Chuva moderada";
+            } else if (totaldia < 50) {
+                classificacao = "Chuva forte";
+            } else {
+                classificacao = "Chuva muito forte";
+            }
+            media.setClassificacao(classificacao);
+
+            resultado.add(media);
+        }
+        resultado.sort(Comparator.comparing(ClassficacaoChuvaDto::getData));
+        return resultado;
+    }
 
     public double probabilidadeChuva5Dias(
             String cidade,

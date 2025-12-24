@@ -35,6 +35,12 @@ public class CidadeController {
             @RequestParam int ano) throws IOException{
         return service.classificarChuva(nome, ano);
     }
+    @GetMapping("/classificacaomedia")
+    public List<ClassficacaoChuvaDto>mediaclassificarChuva(
+            @RequestParam String nome)
+            throws IOException {
+            return  service.mediaClassificacaoDeChuva(nome);
+    }
     @GetMapping("/dadosano")
     public Map<LocalDate, List<Double>>dadosAno(
             @RequestParam String nome,
