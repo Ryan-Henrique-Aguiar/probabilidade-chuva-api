@@ -47,14 +47,17 @@ public class CidadeController {
             @RequestParam int ano) throws IOException{
         return service.lerdadosano(nome,ano);
     }
-    @GetMapping("/probabilidade5dias")
-    public double probabilidadeDias(
-            @RequestParam String nome,
-            @RequestParam int dia,
-            @RequestParam int mes) throws IOException {
-
-        return service.probabilidadeChuva5Dias(nome, dia, mes);
-    }
+        @GetMapping("/probabilidade5dias")
+        public double probabilidadeDias(
+                @RequestParam String nome,
+                @RequestParam String dia,
+                @RequestParam String mes)
+                throws IOException {
+            if (dia == null || mes == null) {
+                return 0;
+            }
+            return service.probabilidadeChuva5Dias(nome, dia, mes);
+        }
 
 
 }

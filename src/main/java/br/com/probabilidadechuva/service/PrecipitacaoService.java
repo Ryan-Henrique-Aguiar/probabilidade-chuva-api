@@ -157,6 +157,7 @@ public class PrecipitacaoService {
 
             List<ClassficacaoChuvaDto> lista = classificarChuva(cidade, ano);
 
+
             for (ClassficacaoChuvaDto dto : lista) {
 
                 LocalDate dataOriginal = dto.getData();
@@ -226,11 +227,15 @@ public class PrecipitacaoService {
      */
     public double probabilidadeChuva5Dias(
             String cidade,
-            int diaInicio,
-            int mesInicio) throws IOException {
+            String diaInicios,
+            String mesInicios) throws IOException {
 
         int diasComChuva = 0;
         int totalDias = 0;
+
+        int diaInicio = Integer.parseInt(diaInicios);
+        int mesInicio = Integer.parseInt(mesInicios);
+
 
         // varre todos os anos disponíveis (2000–2025)
         for (int ano = 2000; ano <= 2025; ano++) {
