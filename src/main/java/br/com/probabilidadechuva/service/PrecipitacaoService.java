@@ -155,7 +155,13 @@ public class PrecipitacaoService {
         // Percorre todos os anos para acumular dados
         for (int ano = anoAtual; ano >= 2000; ano--) {
 
-            List<ClassficacaoChuvaDto> lista = classificarChuva(cidade, ano);
+            List<ClassficacaoChuvaDto> lista;
+            try {
+                lista = classificarChuva(cidade, ano); // tenta pegar os dados do ano
+            } catch (IOException e) {
+                // CSV não existe → ignora este ano
+                continue;
+            }
 
 
             for (ClassficacaoChuvaDto dto : lista) {
