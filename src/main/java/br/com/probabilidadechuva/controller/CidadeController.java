@@ -64,8 +64,18 @@ public class CidadeController {
     }
 
     @GetMapping("/dadosanotemp")
-    public Map<LocalDate,List<List<Double>>>dadosanotemp() throws IOException {
-        return temperaturaService.lerdadostemp();
+    public Map<LocalDate,List<List<Double>>>dadosanotemp(
+            @RequestParam String nome,
+            @RequestParam int ano
+    ) throws IOException {
+        return temperaturaService.lerdadostemp(nome,ano);
+    }
+    @GetMapping("/mediadadosanotemp")
+    public Map<LocalDate,List<Double>>mediadadosanotemp(
+            @RequestParam String nome,
+            @RequestParam int ano
+    ) throws IOException {
+        return temperaturaService.mediasTemp(nome,ano);
     }
 
 
