@@ -4,6 +4,7 @@ import br.com.probabilidadechuva.dto.ChuvaDiariaDto;
 import br.com.probabilidadechuva.dto.ClassficacaoChuvaDto;
 import br.com.probabilidadechuva.service.LocalizacaoService;
 import br.com.probabilidadechuva.service.PrecipitacaoService;
+import br.com.probabilidadechuva.service.TemperaturaService;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -17,9 +18,12 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class CidadeController {
     private final PrecipitacaoService service;
+    private final TemperaturaService temperaturaService;
 
-    public CidadeController(PrecipitacaoService service) {
+
+    public CidadeController(PrecipitacaoService service, TemperaturaService temperaturaService) {
         this.service = service;
+        this.temperaturaService = temperaturaService;
     }
 
     @GetMapping("/medias")
@@ -47,17 +51,22 @@ public class CidadeController {
             @RequestParam int ano) throws IOException{
         return service.lerdadosano(nome,ano);
     }
-        @GetMapping("/probabilidade5dias")
-        public double probabilidadeDias(
-                @RequestParam String nome,
-                @RequestParam String dia,
-                @RequestParam String mes)
-                throws IOException {
-            if (dia == null || mes == null) {
-                return 0;
-            }
-            return service.probabilidadeChuva5Dias(nome, dia, mes);
+    @GetMapping("/probabilidade5dias")
+    public double probabilidadeDias(
+            @RequestParam String nome,
+            @RequestParam String dia,
+            @RequestParam String mes)
+            throws IOException {
+        if (dia == null || mes == null) {
+            return 0;
         }
+        return service.probabilidadeChuva5Dias(nome, dia, mes);
+    }
+
+    @GetMapping("/dadosanotemp")
+    public Map<LocalDate,List<List<Double>>>dadosanotemp() throws IOException {
+        return temperaturaService.lerdadostemp();
+    }
 
 
 }
