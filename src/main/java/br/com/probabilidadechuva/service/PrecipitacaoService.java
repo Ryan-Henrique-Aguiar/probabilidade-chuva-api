@@ -209,6 +209,8 @@ public class PrecipitacaoService {
 
             if (totaldia == 0) {
                 classificacao = "Sem chuva";
+            } else if (totaldia<1) {
+                classificacao = "Parcialmente Nublado";
             } else if (totaldia < 2.5) {
                 classificacao = "Chuva fraca";
             } else if (totaldia < 10) {
