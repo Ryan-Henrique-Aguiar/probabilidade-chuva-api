@@ -2,14 +2,13 @@ package br.com.probabilidadechuva.controller;
 
 import br.com.probabilidadechuva.dto.ChuvaDiariaDto;
 import br.com.probabilidadechuva.dto.ClassficacaoChuvaDto;
-import br.com.probabilidadechuva.service.LocalizacaoService;
+import br.com.probabilidadechuva.dto.TemperaturaDiariaDto;
 import br.com.probabilidadechuva.service.PrecipitacaoService;
 import br.com.probabilidadechuva.service.TemperaturaService;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -71,12 +70,18 @@ public class CidadeController {
         return temperaturaService.lerdadostemp(nome,ano);
     }
     @GetMapping("/mediadadosanotemp")
-    public Map<LocalDate,List<Double>>mediadadosanotemp(
+    public List<TemperaturaDiariaDto> mediadadosanotemp(
             @RequestParam String nome,
             @RequestParam int ano
     ) throws IOException {
         return temperaturaService.mediasTemp(nome,ano);
     }
+    @GetMapping("/mediatotaltempumid")
+    public List<TemperaturaDiariaDto> mediatotaltempumid(
+        @RequestParam String nome)throws IOException{
+            return temperaturaService.mediaTotalTempUmid(nome);
+        }
+
 
 
 }
